@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hành Trình Khám Phá: Chinh Phục Số Thập Phân</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            /* Nền bầu trời tươi sáng, rực rỡ */
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #334155;
+        }
+
+        /* Glassmorphism phong cách tươi sáng */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1), inset 0 0 0 4px rgba(255,255,255,0.7);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-bright {
+            background: linear-gradient(to bottom, #fcd34d, #f59e0b);
+            color: white;
+            border-radius: 999px;
+            box-shadow: 0 6px 0 #d97706, 0 10px 15px rgba(0,0,0,0.1);
+            transition: all 0.1s;
+            text-shadow: 1px 1px 2px rgba(217, 119, 6, 0.5);
+            font-weight: 900;
+        }
+        .btn-bright:active:not(:disabled) {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #d97706, 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-bright:disabled {
+            background: linear-gradient(to bottom, #cbd5e1, #94a3b8);
+            box-shadow: 0 6px 0 #64748b;
+            cursor: not-allowed;
+            transform: none;
+            text-shadow: none;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #e2e8f0;
+            border-radius: 20px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            color: #334155;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.02);
+            border-color: #38bdf8;
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2);
+        }
+        .option-btn.correct {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+        .option-btn.wrong {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .option-btn.selected {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            transform: scale(1.02);
+        }
+
+        .input-fill {
+            background: white;
+            color: #1e293b;
+            border: 4px solid #bae6fd;
+            text-align: center;
+            border-radius: 20px;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .input-fill:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.05), 0 0 15px rgba(56,189,248,0.4);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating { animation: float 4s ease-in-out infinite; }
+
+        @keyframes cloud-move {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100vw); }
+        }
+        .cloud {
+            position: absolute;
+            opacity: 0.8;
+            pointer-events: none;
+            z-index: -1;
+            animation: cloud-move linear infinite;
+        }
+
+        @keyframes bounce-in {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .animate-bounce-in { animation: bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        /* Fireworks */
+        @keyframes firework-explode {
+            0% { transform: scale(0); opacity: 1; }
+            50% { opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .firework {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #ff0 10%, transparent 10%),
+                        radial-gradient(circle, #ff0 10%, transparent 10%),
+                        radial-gradient(circle, #f0f 10%, transparent 10%),
+                        radial-gradient(circle, #0ff 10%, transparent 10%);
+            background-size: 15px 15px;
+            background-position: 50% 0%, 50% 100%, 0% 50%, 100% 50%;
+            background-repeat: no-repeat;
+            animation: firework-explode 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Toán học - Fraction styling */
+        .frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 0.2rem;
+            font-size: 0.9em;
+            line-height: 1.2;
+            font-weight: bold;
+        }
+        .frac .num {
+            border-bottom: 2px solid currentColor;
+            padding: 0 0.2rem;
+        }
+        .frac .den {
+            padding: 0 0.2rem;
+        }
+        .mix {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+        }
+        .mix-int {
+            margin-right: 0.2rem;
+            font-weight: bold;
+        }
+
+        .typing-indicator::after {
+            content: '.';
+            animation: typing 1.5s infinite steps(4, end);
+        }
+        @keyframes typing {
+            0%, 100% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+        }
+
+        .hidden-screen { display: none !important; }
+        .match-col { display: flex; flex-direction: column; gap: 12px; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.5); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.8); }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 relative">
+
+    <div class="cloud text-8xl" style="top: 10%; animation-duration: 40s;">☁️</div>
+    <div class="cloud text-9xl" style="top: 40%; animation-duration: 60s; opacity: 0.5;">☁️</div>
+    <div class="cloud text-7xl" style="top: 70%; animation-duration: 45s; animation-delay: -20s;">☁️</div>
+
+    <div id="start-screen" class="glass-panel w-full max-w-lg p-8 flex flex-col items-center animate-bounce-in text-center relative z-10">
+        
+        <div class="mb-6 floating relative">
+            <!-- Khí cầu tươi sáng -->
+            <div class="text-9xl">🎈</div>
+            <div class="absolute -top-4 -right-4 text-5xl floating" style="animation-delay: 1s">✨</div>
+            <div class="absolute bottom-4 -left-6 text-5xl floating" style="animation-delay: 2s">🌟</div>
+        </div>
+
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-teal-400 mb-3 drop-shadow-sm">
+            Hành Trình Tri Thức
+        </h1>
+        <h2 class="text-xl font-bold text-slate-500 mb-8 bg-slate-100 py-2 px-4 rounded-full border border-slate-200">
+            Khám phá Số Thập Phân & Đo Lường
+        </h2>
+        
+        <div class="w-full mb-8 relative">
+            <label class="block text-left font-bold mb-3 text-slate-600 ml-2">Tên nhà thám hiểm:</label>
+            <input type="text" id="player-name" placeholder="Nhập tên của con..." class="w-full px-6 py-4 rounded-2xl bg-white border-4 border-blue-100 focus:border-blue-400 focus:outline-none text-xl font-bold text-center text-slate-700 placeholder-slate-300 transition-colors shadow-inner">
+        </div>
+
+        <button onclick="startGame()" class="btn-bright w-full py-4 text-2xl uppercase tracking-wider relative z-10">
+            Bắt đầu khám phá! 🚀
+        </button>
+        
+        <div class="mt-6 text-sm font-bold text-slate-500 bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-3 text-left">
+            <div class="text-3xl">🤖</div> 
+            <div><span class="text-blue-500">Trợ lý AI:</span> "Chào bạn! Hãy vượt qua 20 thử thách để chinh phục hòn đảo nhé. Tớ sẽ luôn ở đây để hướng dẫn bạn!"</div>
+        </div>
+    </div>
+
+    <div id="game-screen" class="glass-panel w-full max-w-3xl p-6 md:p-8 flex flex-col hidden-screen relative z-10">
+        <div id="firework-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50 rounded-3xl"></div>
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 bg-white/80 p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-2 font-bold text-xl text-slate-600">
+                👤 <span id="display-name" class="text-blue-500">Người chơi</span>
+            </div>
+            <div class="flex items-center gap-2 font-black text-3xl text-amber-500">
+                ⭐ <span id="score">0</span>
+            </div>
+        </div>
+
+        <!-- Progress & Level -->
+        <div class="mb-3 flex justify-between items-end text-sm font-bold text-slate-500">
+            <span id="level-badge" class="px-3 py-1.5 bg-green-100 text-green-600 border border-green-200 rounded-xl shadow-sm">Mức 1: Khởi động</span>
+            <span id="question-counter" class="text-lg bg-slate-100 px-3 py-1 rounded-lg">Câu 1/20</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded-full h-4 mb-8 border border-slate-300 overflow-hidden relative">
+            <div id="progress-bar" class="bg-gradient-to-r from-blue-400 via-teal-400 to-green-400 h-full rounded-full transition-all duration-500 w-0 relative">
+                <div class="absolute inset-0 bg-white/20 w-full h-full" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
+            </div>
+        </div>
+
+        <!-- Timer -->
+        <div class="flex items-center justify-center mb-6">
+            <div class="relative w-24 h-24 flex items-center justify-center bg-white rounded-full shadow-lg border-4 border-slate-100">
+                <span id="timer-text" class="text-4xl font-black text-slate-700">20</span>
+                <svg class="absolute top-0 left-0 w-full h-full transform -rotate-90">
+                    <circle cx="44" cy="44" r="40" transform="translate(4,4)" stroke="transparent" stroke-width="6" fill="none"></circle>
+                    <circle id="timer-circle" cx="44" cy="44" r="40" transform="translate(4,4)" stroke="#38bdf8" stroke-width="6" fill="none" stroke-dasharray="251" stroke-dashoffset="0" class="transition-all duration-1000 linear stroke-round"></circle>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Question Area -->
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-md mb-8 border-2 border-blue-50 text-center min-h-[120px] flex items-center justify-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-teal-400"></div>
+            <h3 id="question-text" class="text-2xl md:text-3xl font-bold text-slate-700 leading-relaxed">Câu hỏi sẽ hiện ở đây</h3>
+        </div>
+
+        <!-- Dynamic Interaction Container -->
+        <div id="interaction-container" class="w-full">
+            <!-- Render via JS -->
+        </div>
+    </div>
+
+    <div id="feedback-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] p-6 md:p-8 max-w-lg w-full animate-bounce-in shadow-2xl relative border-4 border-blue-100">
+            <!-- AI Avatar -->
+            <div class="absolute -top-10 -right-4 w-24 h-24 bg-white rounded-full flex items-center justify-center text-5xl border-4 border-blue-100 shadow-xl floating">
+                🤖
+            </div>
+            
+            <div class="pr-16 mb-4">
+                <h2 id="feedback-title" class="text-3xl font-black mb-2 text-slate-800">Tuyệt vời!</h2>
+                <p id="feedback-subtitle" class="text-base font-bold text-slate-500">Bạn nhận được 10 ngôi sao!</p>
+            </div>
+
+            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 mb-8 shadow-inner">
+                <p id="feedback-explanation" class="text-slate-700 font-semibold text-lg leading-relaxed">
+                    Đang kết nối với Trợ lý AI...
+                </p>
+            </div>
+
+            <button onclick="nextQuestion()" id="next-btn" class="btn-bright w-full py-4 text-xl uppercase tracking-wide">
+                Tiếp tục hành trình ➡️
+            </button>
+        </div>
+    </div>
+
+    <div id="end-screen" class="glass-panel w-full max-w-lg p-8 flex flex-col items-center hidden-screen animate-bounce-in z-10">
+        <div class="text-8xl mb-6 floating">🏆</div>
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2 text-center drop-shadow-sm">
+            Chúc Mừng Hoàn Thành!
+        </h1>
+        
+        <div class="bg-white p-8 rounded-3xl w-full text-center border-2 border-amber-100 mb-8 shadow-md">
+            <p class="text-lg font-bold text-slate-500 mb-2">Nhà thám hiểm xuất sắc</p>
+            <p id="final-player-name" class="text-3xl font-black text-blue-500 mb-4">Tên</p>
+            <div class="flex items-center justify-center gap-3 text-6xl font-black text-amber-400 drop-shadow-md">
+                ⭐ <span id="final-score">0</span>
+            </div>
+            <p id="final-message" class="mt-6 text-green-500 font-bold text-xl">Trợ lý AI rất tự hào về bạn!</p>
+        </div>
+
+        <div class="w-full bg-slate-50 rounded-2xl p-5 border border-slate-200 mb-8">
+            <h3 class="text-center font-bold text-slate-600 mb-4 flex items-center justify-center gap-2 uppercase tracking-wider text-sm">
+                📋 Bảng Vàng Vinh Danh
+            </h3>
+            <div id="leaderboard-list" class="space-y-3 max-h-48 overflow-y-auto pr-2">
+                <!-- JS Render -->
+            </div>
+        </div>
+
+        <button onclick="location.reload()" class="btn-bright w-full py-4 text-xl uppercase tracking-wider">
+            🔄 Khám phá lại từ đầu
+        </button>
+    </div>
+
+    <script>
+        const questions = [
+            // MỨC 1 (20s) - Nhận biết, So sánh, Làm tròn cơ bản
+            { level: 1, type: 'mcq', time: 20, q: "Số thập phân nào LỚN HƠN trong hai số: 89,04 và 89,1?", options: ["A. 89,04", "B. 89,1", "C. Bằng nhau", "D. Không so sánh được"], correct: 1, exp: "Để so sánh, ta làm cho số chữ số ở phần thập phân bằng nhau bằng cách thêm số 0. Ta có 89,1 = 89,10. So sánh 89,04 và 89,10: Phần nguyên bằng nhau (89). Ở hàng phần mười, 0 < 1. Vậy 89,1 lớn hơn." },
+            { level: 1, type: 'fill', time: 20, q: "Làm tròn số 123,72 đến số tự nhiên gần nhất ta được số nào? (Nhập số)", correctAnswers: ["124"], exp: "Để làm tròn đến số tự nhiên gần nhất, ta quan sát chữ số ở hàng phần mười. Vì 7 lớn hơn 5 nên ta cộng thêm 1 vào phần nguyên. Kết quả là 124." },
+            { level: 1, type: 'mcq', time: 20, q: "Số thập phân nào BÉ NHẤT trong các số: 6,78 ; 6,078 ; 6,708 ; 6,807?", options: ["A. 6,78", "B. 6,078", "C. 6,708", "D. 6,807"], correct: 1, exp: "Các số đều có phần nguyên là 6. Xét hàng phần mười: 0 < 7 < 8. Số có chữ số hàng phần mười là 0 sẽ bé nhất. Vậy 6,078 là số bé nhất." },
+            { level: 1, type: 'match', time: 30, q: "Ghép nối số thập phân với kết quả SAU KHI LÀM TRÒN đến hàng phần mười:", pairs: [ { left: "9,34", right: "9,3" }, { left: "9,38", right: "9,4" }, { left: "9,46", right: "9,5" } ], exp: "Khi làm tròn đến hàng phần mười, ta xét hàng phần trăm. 9,34 có 4 < 5 nên giữ nguyên 9,3. 9,38 có 8 > 5 nên làm tròn lên 9,4. 9,46 có 6 > 5 nên làm tròn lên 9,5." },
+            { level: 1, type: 'mcq', time: 20, q: "Điền dấu thích hợp: 56,0900 ... 56,09", options: ["A. >", "B. <", "C. =", "D. Không so sánh được"], correct: 2, exp: "Nếu ta xóa các chữ số 0 ở tận cùng bên phải phần thập phân của một số thập phân thì được một số thập phân bằng nó. Vậy 56,0900 = 56,09." },
+            
+            // MỨC 2 (30s) - Đổi đơn vị độ dài, khối lượng qua Hỗn số
+            { level: 2, type: 'mcq', time: 30, q: "8 m 6 cm viết dưới dạng số thập phân là bao nhiêu mét?", options: ["A. 8,6 m", "B. 8,06 m", "C. 8,006 m", "D. 86 m"], correct: 1, exp: "Ta có 1m = 100cm nên 6cm = {{6/100}} m. Chuyển thành hỗn số ta được {{8 6/100}} m. Viết dưới dạng số thập phân là 8,06 m." },
+            { level: 2, type: 'fill', time: 30, q: "Nhập số thập phân thích hợp: 25 kg 8 g = ... kg", correctAnswers: ["25,008", "25.008"], exp: "Ta có 1kg = 1000g nên 8g = {{8/1000}} kg. Chuyển thành hỗn số là {{25 8/1000}} kg. Viết dưới dạng số thập phân là 25,008 kg." },
+            { level: 2, type: 'mcq', time: 30, q: "9 tấn 315 kg = ... tấn. Số thập phân thích hợp điền vào chỗ chấm là:", options: ["A. 9,315", "B. 9,0315", "C. 93,15", "D. 9315"], correct: 0, exp: "Ta có 1 tấn = 1000 kg nên 315 kg = {{315/1000}} tấn. Hỗn số là {{9 315/1000}} tấn. Chuyển sang số thập phân là 9,315 tấn." },
+            { level: 2, type: 'match', time: 40, q: "Ghép các số đo độ dài bằng nhau:", pairs: [ { left: "12 km 50 m", right: "12,05 km" }, { left: "12 km 500 m", right: "12,5 km" }, { left: "12 km 5 m", right: "12,005 km" } ], exp: "1km = 1000m. 12km 50m = {{12 50/1000}} km = 12,05km. 12km 500m = {{12 500/1000}} km = 12,5km. 12km 5m = {{12 5/1000}} km = 12,005km." },
+            { level: 2, type: 'mcq', time: 30, q: "Làm tròn số 28,635 đến hàng phần trăm ta được số nào?", options: ["A. 28,63", "B. 28,64", "C. 28,6", "D. 28,7"], correct: 1, exp: "Để làm tròn đến hàng phần trăm, ta xét chữ số ở hàng phần nghìn. Chữ số hàng phần nghìn là 5, nên ta cộng thêm 1 vào chữ số hàng phần trăm. Kết quả là 28,64." },
+            { level: 2, type: 'fill', time: 30, q: "Sắp xếp từ bé đến lớn: 14,9 ; 14,09 ; 14,902. Nhập số BÉ NHẤT trong 3 số này:", correctAnswers: ["14,09", "14.09"], exp: "So sánh: Phần nguyên đều là 14. Ở hàng phần mười: 0 < 9 nên 14,09 bé nhất. So sánh 14,9 (tức 14,900) và 14,902 ở hàng phần nghìn: 0 < 2. Vậy số lớn nhất là 14,902, số bé nhất là 14,09." },
+            { level: 2, type: 'mcq', time: 30, q: "Khẳng định nào sau đây là ĐÚNG?", options: ["A. 5m 8dm = 5,08m", "B. 7kg 25g = 7,25kg", "C. 6km 4m = 6,004km", "D. 2 tấn 10kg = 2,1 tấn"], correct: 2, exp: "Khẳng định C đúng vì 6km 4m = {{6 4/1000}} km = 6,004 km. Câu A sai vì 5m 8dm = 5,8m. Câu B sai vì 7kg 25g = 7,025kg." },
+
+            // MỨC 3 (40s) - Sắp xếp, Km2, Héc-ta
+            { level: 3, type: 'mcq', time: 40, q: "Làm quen đơn vị diện tích: 4 héc-ta (ha) bằng bao nhiêu mét vuông?", options: ["A. 400 m²", "B. 4 000 m²", "C. 40 000 m²", "D. 400 000 m²"], correct: 2, exp: "Héc-ta là diện tích của một hình vuông có cạnh dài 100m. Diện tích 1 ha là 100 x 100 = 10 000 m². Vậy 4 ha = 40 000 m²." },
+            { level: 3, type: 'fill', time: 40, q: "Đổi 7,2 ha = ... m² (Nhập số tự nhiên)", correctAnswers: ["72000", "72 000", "72.000"], exp: "Vì 1 ha = 10 000 m², nên để đổi từ ha sang m² ta gấp lên 10 000 lần. 7,2 ha = 7,2 x 10 000 = 72 000 m²." },
+            { level: 3, type: 'mcq', time: 40, q: "8 ki-lô-mét vuông (km²) bằng bao nhiêu héc-ta (ha)?", options: ["A. 80 ha", "B. 800 ha", "C. 8 000 ha", "D. 80 000 ha"], correct: 1, exp: "1 km² = 1 000 000 m². 1 ha = 10 000 m². Do đó 1 km² gấp 100 lần 1 ha. Vậy 8 km² = 800 ha." },
+            { level: 3, type: 'match', time: 45, q: "Ghép các số đo diện tích bằng nhau:", pairs: [ { left: "6 ha", right: "60 000 m²" }, { left: "9 km²", right: "900 ha" }, { left: "250 000 m²", right: "25 ha" } ], exp: "Áp dụng: 1 ha = 10 000 m² nên 6 ha = 60 000 m² và 250 000 m² = 25 ha. 1 km² = 100 ha nên 9 km² = 900 ha." },
+            { level: 3, type: 'mcq', time: 40, q: "Tìm số tự nhiên x BÉ NHẤT thỏa mãn: 34,98 < x < 38,05", options: ["A. 34", "B. 35", "C. 37", "D. 38"], correct: 1, exp: "Các số tự nhiên lớn hơn 34,98 và bé hơn 38,05 bao gồm: 35, 36, 37, 38. Số tự nhiên bé nhất thỏa mãn điều kiện là 35." },
+            { level: 3, type: 'fill', time: 40, q: "Đổi 12 km² 8 ha = ... ha. Số cần điền là:", correctAnswers: ["1208", "1.208", "1 208"], exp: "Vì 1 km² = 100 ha nên 12 km² = 1200 ha. Vậy 12 km² 8 ha = 1200 ha + 8 ha = 1208 ha." },
+            { level: 3, type: 'mcq', time: 40, q: "Sắp xếp các số đo sau từ BÉ ĐẾN LỚN: 4,2 km ; 4 km 20 m ; 4,025 km.", options: ["A. 4 km 20 m ; 4,025 km ; 4,2 km", "B. 4,025 km ; 4 km 20 m ; 4,2 km", "C. 4,2 km ; 4,025 km ; 4 km 20 m", "D. 4 km 20 m ; 4,2 km ; 4,025 km"], correct: 0, exp: "Đổi về số thập phân: 4 km 20 m = {{4 20/1000}} km = 4,02 km. So sánh: 4,02 < 4,025 < 4,2. Thứ tự đúng là: 4 km 20 m ; 4,025 km ; 4,2 km." },
+            { level: 3, type: 'mcq', time: 40, q: "Một khu bảo tồn thiên nhiên có diện tích 6,8 km². Hỏi khu bảo tồn đó rộng bao nhiêu héc-ta?", options: ["A. 68 ha", "B. 680 ha", "C. 6800 ha", "D. 608 ha"], correct: 1, exp: "Vì 1 km² = 100 ha, nên để đổi 6,8 km² ra ha, ta gấp lên 100 lần. 6,8 x 100 = 680. Vậy khu bảo tồn rộng 680 ha." }
+        ];
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.15);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.6);
+                createFirework();
+                playApplause();
+            } else if (type === 'wrong') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.4);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            }
+        }
+
+        function playApplause() {
+            if(!audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * 1.5; 
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const noiseFilter = audioCtx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.value = 1000;
+            noise.connect(noiseFilter);
+            
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(audioCtx.destination);
+            noise.start();
+        }
+
+        function createFirework() {
+            const container = document.getElementById('firework-container');
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = Math.random() * 80 + 10 + '%';
+            firework.style.top = Math.random() * 60 + 10 + '%';
+            container.appendChild(firework);
+            setTimeout(() => {
+                if(container.contains(firework)) container.removeChild(firework);
+            }, 1000);
+        }
+
+        let playerName = "";
+        let score = 0;
+        let currentQIndex = 0;
+        let timeLeft = 0;
+        let timerInterval;
+        const totalQuestions = questions.length;
+        
+        let matchState = {
+            leftSelected: null,
+            rightSelected: null,
+            matchedCount: 0,
+            totalPairs: 0
+        };
+
+        function formatMath(text) {
+            let res = text.replace(/\{\{(\d+)\s+(\d+)\/(\d+)\}\}/g, '<span class="mix"><span class="mix-int">$1</span><span class="frac"><span class="num">$2</span><span class="den">$3</span></span></span>');
+            res = res.replace(/\{\{(\d+)\/(\d+)\}\}/g, '<span class="frac"><span class="num">$1</span><span class="den">$2</span></span>');
+            return res;
+        }
+
+        let leaderboard = [
+            { name: "Khám Phá Gia", score: 180 },
+            { name: "Nhà Toán Học", score: 150 },
+            { name: "Trí Tuệ AI", score: 120 }
+        ];
+
+        async function getAIFeedback(questionData, studentAnswerText, isCorrect, fallbackExp) {
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = `Bạn là "Trợ lý AI", một robot gia sư Toán lớp 5 ảo, thân thiện, vui vẻ.
+Nhiệm vụ: Giải thích ngắn gọn (2-3 câu) tại sao đáp án đúng lại đúng, hoặc phân tích nhẹ nhàng tại sao học sinh sai để các em hiểu bài.
+YÊU CẦU BẮT BUỘC VỀ ĐỊNH DẠNG TOÁN HỌC:
+- Xưng "Tớ" hoặc "AI", gọi học sinh là "bạn" hoặc "nhà thám hiểm".
+- NẾU CÓ phân số, BẮT BUỘC dùng cú pháp: {{a/b}} (VD: {{3/10}}).
+- NẾU CÓ hỗn số, BẮT BUỘC dùng cú pháp: {{a b/c}} (VD: {{2 5/100}}).
+- Tuyệt đối KHÔNG nhắc đến phép cộng, trừ, nhân, chia số thập phân. Chỉ giải thích dựa trên cấu tạo số thập phân, so sánh và đổi đơn vị thông qua phân số thập phân/hỗn số.`;
+
+            let correctTextStr = "";
+            if(questionData.type === 'mcq') correctTextStr = questionData.options[questionData.correct];
+            else if(questionData.type === 'fill') correctTextStr = questionData.correctAnswers.join(" hoặc ");
+            else if(questionData.type === 'match') correctTextStr = "Ghép đúng tất cả các cặp.";
+
+            const userPrompt = `Câu hỏi: ${questionData.q}\nĐáp án đúng: ${correctTextStr}\nHọc sinh phản hồi: ${studentAnswerText}\nKết quả: ${isCorrect ? 'Đúng' : 'Sai'}. Hãy nhận xét, động viên và giải thích kiến thức. Lời giải gốc để tham khảo: ${fallbackExp}`;
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content.parts[0].text) {
+                    return result.candidates[0].content.parts[0].text;
+                }
+                return fallbackExp;
+            } catch (error) {
+                return "Kết nối vũ trụ hơi chậm, Trợ lý AI gửi bạn lời giải sẵn nhé: " + fallbackExp;
+            }
+        }
+
+        function startGame() {
+            const inputName = document.getElementById('player-name').value.trim();
+            if(!inputName) {
+                const inputEl = document.getElementById('player-name');
+                inputEl.classList.add('border-red-400');
+                setTimeout(() => inputEl.classList.remove('border-red-400'), 500);
+                return;
+            }
+            playerName = inputName;
+            initAudio();
+
+            document.getElementById('display-name').innerText = playerName;
+            score = 0;
+            currentQIndex = 0;
+            updateScoreUI();
+
+            switchScreen('start-screen', 'game-screen');
+            loadQuestion();
+        }
+
+        function switchScreen(hideId, showId) {
+            document.getElementById(hideId).classList.add('hidden-screen');
+            document.getElementById(showId).classList.remove('hidden-screen');
+        }
+
+        function loadQuestion() {
+            const qData = questions[currentQIndex];
+            
+            document.getElementById('question-counter').innerText = `Câu ${currentQIndex + 1}/${totalQuestions}`;
+            const progressPercent = (currentQIndex / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            const badge = document.getElementById('level-badge');
+            if (qData.level === 1) {
+                badge.innerText = "Mức 1: Khởi động (20s)";
+                badge.className = "px-3 py-1 bg-green-100 text-green-700 border border-green-200 rounded-xl shadow-sm";
+            } else if (qData.level === 2) {
+                badge.innerText = "Mức 2: Tăng tốc (30s)";
+                badge.className = "px-3 py-1 bg-blue-100 text-blue-700 border border-blue-200 rounded-xl shadow-sm";
+            } else {
+                badge.innerText = "Mức 3: Chinh phục (40s)";
+                badge.className = "px-3 py-1 bg-purple-100 text-purple-700 border border-purple-200 rounded-xl shadow-sm";
+            }
+
+            document.getElementById('question-text').innerHTML = formatMath(qData.q);
+
+            const container = document.getElementById('interaction-container');
+            container.innerHTML = "";
+
+            if (qData.type === 'mcq') {
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
+                qData.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn w-full p-5 text-xl font-bold cursor-pointer flex items-center";
+                    btn.innerHTML = `<span class="mr-2 text-blue-500 font-black">${opt.charAt(0)}</span> ` + formatMath(opt.substring(2));
+                    btn.onclick = () => processAnswer(index, 'mcq');
+                    grid.appendChild(btn);
+                });
+                container.appendChild(grid);
+            } 
+            else if (qData.type === 'fill') {
+                const wrap = document.createElement('div');
+                wrap.className = "flex flex-col items-center gap-5";
+                const input = document.createElement('input');
+                input.type = "text";
+                input.id = "fill-input";
+                input.autocomplete = "off";
+                input.className = "input-fill w-full max-w-sm p-4 text-3xl font-black transition-all";
+                input.placeholder = "Nhập số...";
+                
+                const btn = document.createElement('button');
+                btn.className = "btn-bright w-full max-w-sm py-4 text-xl tracking-wide";
+                btn.innerText = "Gửi Đáp Án 📡";
+                btn.onclick = () => {
+                    if(input.value.trim() !== "") processAnswer(input.value, 'fill');
+                };
+                
+                input.addEventListener("keypress", function(event) {
+                    if (event.key === "Enter") btn.click();
+                });
+
+                wrap.appendChild(input);
+                wrap.appendChild(btn);
+                container.appendChild(wrap);
+                setTimeout(() => input.focus(), 100);
+            }
+            else if (qData.type === 'match') {
+                matchState = { leftSelected: null, rightSelected: null, matchedCount: 0, totalPairs: qData.pairs.length };
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-2 gap-6";
+                
+                const leftCol = document.createElement('div');
+                leftCol.className = "match-col";
+                const rightCol = document.createElement('div');
+                rightCol.className = "match-col";
+
+                let rightItems = qData.pairs.map((p, i) => ({ text: p.right, id: i }));
+                rightItems = rightItems.sort(() => Math.random() - 0.5);
+
+                qData.pairs.forEach((p, i) => {
+                    const btnL = document.createElement('button');
+                    btnL.className = "option-btn p-4 text-lg font-bold text-center";
+                    btnL.innerHTML = formatMath(p.left);
+                    btnL.id = `match-l-${i}`;
+                    btnL.onclick = () => handleMatchClick('left', i, btnL);
+                    leftCol.appendChild(btnL);
+                });
+
+                rightItems.forEach((r) => {
+                    const btnR = document.createElement('button');
+                    btnR.className = "option-btn p-4 text-lg font-bold text-center";
+                    btnR.innerHTML = formatMath(r.text);
+                    btnR.id = `match-r-${r.id}`;
+                    btnR.onclick = () => handleMatchClick('right', r.id, btnR);
+                    rightCol.appendChild(btnR);
+                });
+
+                grid.appendChild(leftCol);
+                grid.appendChild(rightCol);
+                container.appendChild(grid);
+            }
+
+            startTimer(qData.time);
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            const fullTime = seconds;
+            updateTimerUI(fullTime);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI(fullTime);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    processAnswer(null, 'timeout');
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI(fullTime) {
+            document.getElementById('timer-text').innerText = timeLeft;
+            const circumference = 251; // 2 * pi * 40
+            const offset = circumference - (timeLeft / fullTime) * circumference;
+            document.getElementById('timer-circle').style.strokeDashoffset = offset;
+            
+            const timerText = document.getElementById('timer-text');
+            const timerCircle = document.getElementById('timer-circle');
+            if (timeLeft <= 5) {
+                timerText.classList.add('text-red-500');
+                timerCircle.setAttribute('stroke', '#ef4444');
+            } else {
+                timerText.classList.remove('text-red-500');
+                timerCircle.setAttribute('stroke', '#38bdf8');
+            }
+        }
+
+        function handleMatchClick(side, id, element) {
+            if(element.disabled) return;
+            playSound('click');
+
+            const colPrefix = side === 'left' ? 'match-l-' : 'match-r-';
+            const qData = questions[currentQIndex];
+            
+            // Xóa chọn ở cùng cột
+            for(let i=0; i<qData.pairs.length; i++) {
+                const el = document.getElementById(`${colPrefix}${i}`);
+                if(el && !el.disabled) el.classList.remove('selected');
+            }
+
+            element.classList.add('selected');
+            if(side === 'left') matchState.leftSelected = { id, el: element };
+            else matchState.rightSelected = { id, el: element };
+
+            if(matchState.leftSelected && matchState.rightSelected) {
+                const l = matchState.leftSelected;
+                const r = matchState.rightSelected;
+                
+                if(l.id === r.id) {
+                    // Ghép đúng
+                    l.el.classList.remove('selected'); r.el.classList.remove('selected');
+                    l.el.classList.add('correct'); r.el.classList.add('correct');
+                    l.el.disabled = true; r.el.disabled = true;
+                    playSound('correct');
+                    
+                    matchState.matchedCount++;
+                    matchState.leftSelected = null; matchState.rightSelected = null;
+
+                    if(matchState.matchedCount === matchState.totalPairs) {
+                        setTimeout(() => processAnswer(true, 'match_success'), 500);
+                    }
+                } else {
+                    // Ghép sai
+                    l.el.classList.remove('selected'); r.el.classList.remove('selected');
+                    l.el.classList.add('wrong'); r.el.classList.add('wrong');
+                    playSound('wrong');
+                    
+                    const leftText = qData.pairs[l.id].left;
+                    const rightText = qData.pairs[r.id].right;
+                    
+                    setTimeout(() => processAnswer({leftText, rightText}, 'match_fail'), 600);
+                }
+            }
+        }
+
+        async function processAnswer(answerData, answerType) {
+            clearInterval(timerInterval);
+            const qData = questions[currentQIndex];
+            let isCorrect = false;
+            let studentAnswerLog = "";
+
+            const container = document.getElementById('interaction-container');
+            const allBtns = container.querySelectorAll('button, input');
+            allBtns.forEach(btn => btn.disabled = true);
+
+            if (answerType === 'timeout') {
+                isCorrect = false;
+                studentAnswerLog = "Hết giờ (không có đáp án)";
+            } 
+            else if (qData.type === 'mcq') {
+                isCorrect = (answerData === qData.correct);
+                studentAnswerLog = qData.options[answerData];
+                
+                const btns = container.querySelectorAll('.option-btn');
+                btns[qData.correct].classList.add('correct');
+                if(!isCorrect) btns[answerData].classList.add('wrong');
+            } 
+            else if (qData.type === 'fill') {
+                const stdAns = answerData.trim().toLowerCase();
+                isCorrect = qData.correctAnswers.some(ans => ans.toLowerCase() === stdAns);
+                studentAnswerLog = stdAns;
+                
+                const inputEl = document.getElementById('fill-input');
+                if(isCorrect) {
+                    inputEl.classList.add('border-green-400', 'bg-green-50', 'text-green-600');
+                } else {
+                    inputEl.classList.add('border-red-400', 'bg-red-50', 'text-red-600');
+                }
+            }
+            else if (answerType === 'match_success') {
+                isCorrect = true;
+                studentAnswerLog = "Học sinh đã ghép đúng tất cả các cặp.";
+            }
+            else if (answerType === 'match_fail') {
+                isCorrect = false;
+                studentAnswerLog = `Học sinh ghép sai cặp: ${answerData.leftText} đi với ${answerData.rightText}`;
+            }
+
+            let feedbackTitle = "";
+            let feedbackSub = "";
+            if (isCorrect) {
+                if(answerType !== 'match_success') playSound('correct');
+                const points = qData.level * 10;
+                score += points;
+                updateScoreUI();
+                feedbackTitle = "Tuyệt vời quá! 🎉";
+                feedbackSub = `Bạn nhận được ${points} ngôi sao ⭐`;
+            } else {
+                if(answerType !== 'match_fail') playSound('wrong'); 
+                feedbackTitle = answerType === 'timeout' ? "Hết thời gian! ⏰" : "Chưa chính xác rồi! 😢";
+                feedbackSub = "Cùng nghe Trợ lý AI phân tích nhé.";
+            }
+
+            document.getElementById('next-btn').disabled = true;
+            showFeedback(feedbackTitle, feedbackSub, "<span class='typing-indicator font-bold text-blue-500'>Trợ lý AI đang phân tích dữ liệu</span>", isCorrect);
+
+            const aiExplanation = await getAIFeedback(qData, studentAnswerLog, isCorrect, qData.exp);
+
+            document.getElementById('feedback-explanation').innerHTML = formatMath(aiExplanation);
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        function updateScoreUI() {
+            document.getElementById('score').innerText = score;
+        }
+
+        function showFeedback(title, sub, exp, isCorrect) {
+            const titleEl = document.getElementById('feedback-title');
+            titleEl.innerText = title;
+            titleEl.className = `text-3xl font-black mb-2 ${isCorrect ? 'text-green-500' : 'text-amber-500'}`;
+            document.getElementById('feedback-subtitle').innerText = sub;
+            document.getElementById('feedback-explanation').innerHTML = formatMath(exp);
+            document.getElementById('feedback-modal').classList.remove('hidden-screen');
+        }
+
+        function nextQuestion() {
+            document.getElementById('feedback-modal').classList.add('hidden-screen');
+            currentQIndex++;
+            
+            if (currentQIndex < totalQuestions) {
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            switchScreen('game-screen', 'end-screen');
+            document.getElementById('final-player-name').innerText = playerName;
+            document.getElementById('final-score').innerText = score;
+            
+            const finalMsgEl = document.getElementById('final-message');
+            if (score >= 400) {
+                finalMsgEl.innerText = "Xuất sắc! Bạn là Nhà Thám Hiểm Tài Ba! 🌟";
+                finalMsgEl.className = "mt-6 text-green-500 font-bold text-xl";
+            } else if (score >= 250) {
+                finalMsgEl.innerText = "Làm tốt lắm! Kiến thức của bạn rất vững! 👍";
+                finalMsgEl.className = "mt-6 text-blue-500 font-bold text-xl";
+            } else {
+                finalMsgEl.innerText = "Không sao đâu! Hãy ôn tập đổi đơn vị và thử lại nhé! 💪";
+                finalMsgEl.className = "mt-6 text-amber-500 font-bold text-xl";
+            }
+
+            updateLeaderboard();
+        }
+
+        function updateLeaderboard() {
+            leaderboard.push({ name: playerName, score: score });
+            leaderboard.sort((a, b) => b.score - a.score);
+            const top5 = leaderboard.slice(0, 5);
+
+            const listEl = document.getElementById('leaderboard-list');
+            listEl.innerHTML = "";
+            
+            top5.forEach((player, index) => {
+                const item = document.createElement('div');
+                const isCurrent = player.name === playerName && player.score === score;
+                const bgClass = isCurrent ? "bg-amber-50 border-amber-300 border-2" : "bg-white border-slate-200 border";
+                
+                let medal = "🏅";
+                if(index === 0) medal = "🥇";
+                if(index === 1) medal = "🥈";
+                if(index === 2) medal = "🥉";
+
+                item.className = `flex justify-between items-center p-3 rounded-xl ${bgClass}`;
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">${medal}</span>
+                        <span class="font-bold text-slate-700">${player.name}</span>
+                    </div>
+                    <div class="font-black text-amber-500 text-lg">
+                        ${player.score} ⭐
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
